@@ -239,6 +239,7 @@
       display:flex;
       align-items:center;
       gap:14px;
+      min-width:0;
     }
 
     .brand-box{
@@ -251,6 +252,7 @@
       transform:rotate(45deg);
       background:linear-gradient(180deg, rgba(0,234,255,.12), rgba(92,160,255,.08));
       box-shadow:0 0 20px rgba(0,234,255,.16);
+      flex:0 0 auto;
     }
 
     .brand-box i{
@@ -320,6 +322,7 @@
       display:flex;
       gap:12px;
       align-items:center;
+      flex:0 0 auto;
     }
 
     main{padding-top:76px}
@@ -722,17 +725,21 @@
     }
 
     .play-btn{
-      width:88px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-width:88px;
       height:88px;
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,.2);
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.2), rgba(255,77,141,.3));
-      display:grid;
-      place-items:center;
+      padding:0 22px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.22);
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), rgba(255,77,141,.32));
       box-shadow:0 0 36px rgba(255,77,141,.28);
       cursor:pointer;
       transition:.22s ease;
       backdrop-filter:blur(10px);
+      color:#fff;
     }
 
     .play-btn:hover{
@@ -740,9 +747,18 @@
       box-shadow:0 0 48px rgba(255,77,141,.36);
     }
 
-    .play-btn span{
+    .play-icon{
       font-size:28px;
-      margin-left:5px;
+      margin-left:2px;
+      line-height:1;
+    }
+
+    .play-text{
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-family:Orbitron,sans-serif;
+      white-space:nowrap;
     }
 
     .gallery-head{
@@ -840,7 +856,7 @@
       font-size:14px;
     }
 
-    /* Character selector */
+    /* Character */
     .char-layout{
       display:grid;
       grid-template-columns:300px 1fr;
@@ -1281,6 +1297,7 @@
       width:100%;
     }
 
+    /* Tablet */
     @media (max-width:1100px){
       .hero-inner,
       .char-panel-inner,
@@ -1315,30 +1332,445 @@
       }
     }
 
+    /* Mobile */
     @media (max-width:820px){
+      .container{
+        width:min(var(--max),calc(100% - 24px));
+      }
+
+      .nav{
+        height:64px;
+      }
+
+      main{
+        padding-top:64px;
+      }
+
+      .brand-text span{
+        display:none;
+      }
+
+      .brand-text strong{
+        font-size:14px;
+        letter-spacing:.18em;
+      }
+
+      .brand-box{
+        width:34px;
+        height:34px;
+      }
+
+      .brand-box i{
+        width:11px;
+        height:11px;
+      }
+
       .nav-links{
         display:none;
       }
 
-      .hero-stats,
-      .flow-grid{
+      .nav-actions .btn{
+        padding:10px 12px;
+        font-size:10px;
+        letter-spacing:.08em;
+      }
+
+      .intro-card{
+        padding:22px;
+        border-radius:22px;
+      }
+
+      .intro-title{
+        font-size:clamp(28px,12vw,46px);
+      }
+
+      .intro-text{
+        font-size:13px;
+        min-height:100px;
+      }
+
+      .intro-actions{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .system-tags{
+        justify-content:flex-start;
+      }
+
+      .hero{
+        min-height:auto;
+        padding-top:8px;
+      }
+
+      .hero-inner{
         grid-template-columns:1fr;
+        gap:28px;
+        padding:36px 0 20px;
+      }
+
+      .eyebrow{
+        font-size:10px;
+        letter-spacing:.18em;
+        gap:8px;
+      }
+
+      .eyebrow::before,
+      .eyebrow::after{
+        width:18px;
+      }
+
+      .headline{
+        font-size:clamp(38px, 14vw, 64px);
+        line-height:1;
+      }
+
+      .headline-note{
+        font-size:10px;
+        letter-spacing:.14em;
+      }
+
+      .hero-copy{
+        font-size:16px;
+        line-height:1.7;
+      }
+
+      .hero-actions{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .hero-actions .btn{
+        width:100%;
+        text-align:center;
+      }
+
+      .hero-stats{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+      }
+
+      .stat-card{
+        padding:14px;
+      }
+
+      .stat-card strong{
+        font-size:22px;
+      }
+
+      .stat-card span{
+        font-size:11px;
+      }
+
+      .hero-panel{
+        min-height:auto;
+      }
+
+      .hero-rings{
+        width:300px;
+      }
+
+      .album-card{
+        padding:18px;
+        border-radius:22px;
+      }
+
+      .album-meta h3{
+        font-size:22px;
+      }
+
+      .album-meta p{
+        font-size:14px;
+      }
+
+      .album-track-tags span{
+        font-size:11px;
+      }
+
+      .section-pad{
+        padding:64px 0;
+      }
+
+      .section-kicker{
+        font-size:10px;
+        letter-spacing:.18em;
+      }
+
+      .section-head h2{
+        font-size:clamp(24px, 8vw, 34px);
+      }
+
+      .section-head p{
+        font-size:15px;
+        line-height:1.7;
+      }
+
+      .flow-grid,
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .flow-card{
+        padding:18px;
+      }
+
+      .flow-card h3{
+        font-size:18px;
+      }
+
+      .flow-card p{
+        font-size:14px;
+      }
+
+      .media-shell{
+        padding:14px;
+        border-radius:22px;
+      }
+
+      .trailer-box{
+        border-radius:18px;
+      }
+
+      .trailer-content{
+        inset:14px;
+      }
+
+      .trailer-top{
+        gap:8px;
+      }
+
+      .trailer-title h3{
+        font-size:22px;
+      }
+
+      .trailer-title p{
+        font-size:14px;
+        line-height:1.6;
+      }
+
+      .trailer-bottom{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:14px;
+      }
+
+      .play-btn{
+        min-width:auto;
+        height:auto;
+        padding:12px 18px;
+        border-radius:999px;
+        gap:8px;
+      }
+
+      .play-icon{
+        font-size:20px;
+      }
+
+      .play-text{
+        font-size:11px;
+        letter-spacing:.08em;
+      }
+
+      .gallery-head{
+        margin:18px 0 12px;
+      }
+
+      .gallery-head h3{
+        font-size:20px !important;
+      }
+
+      .gallery-controls{
+        width:100%;
+        justify-content:flex-end;
       }
 
       .shot{
         min-width:100%;
+        border-radius:18px;
       }
 
-      .hero-copy{
+      .shot-info{
+        padding:14px;
+      }
+
+      .shot-info strong{
+        font-size:16px;
+      }
+
+      .shot-info span{
+        font-size:13px;
+      }
+
+      .char-layout{
+        grid-template-columns:1fr;
+        gap:16px;
+      }
+
+      .char-tabs{
+        display:flex;
+        overflow-x:auto;
+        gap:10px;
+        padding-bottom:6px;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+      }
+
+      .char-tabs::-webkit-scrollbar{
+        height:4px;
+      }
+
+      .char-tabs::-webkit-scrollbar-thumb{
+        background:rgba(0,234,255,.25);
+        border-radius:999px;
+      }
+
+      .char-tab{
+        min-width:220px;
+        flex:0 0 auto;
+        scroll-snap-align:start;
+        padding:14px;
+      }
+
+      .char-tab strong{
         font-size:18px;
       }
 
-      .hero-inner{
-        padding-top:42px;
+      .char-tab span{
+        font-size:13px;
       }
 
-      .trailer-bottom{
-        align-items:flex-start;
+      .char-panel{
+        padding:18px;
+        min-height:auto;
+        border-radius:22px;
+      }
+
+      .char-panel-inner{
+        grid-template-columns:1fr;
+        gap:18px;
+      }
+
+      .char-portrait{
+        min-height:360px;
+        padding:14px;
+        border-radius:20px;
+      }
+
+      .char-ring{
+        inset:34px;
+      }
+
+      .char-photo{
+        width:min(92%,280px);
+        border-radius:18px;
+      }
+
+      .char-symbol{
+        font-size:72px;
+        right:10px;
+        bottom:6px;
+      }
+
+      .chip{
+        font-size:10px;
+      }
+
+      .char-name{
+        font-size:30px;
+      }
+
+      .char-role{
+        font-size:15px;
+      }
+
+      .char-desc{
+        font-size:15px;
+        line-height:1.7;
+      }
+
+      .pill{
+        font-size:11px;
+        padding:7px 10px;
+      }
+
+      .bar-top{
+        font-size:12px;
+      }
+
+      .cta-box{
+        padding:34px 18px;
+        border-radius:22px;
+      }
+
+      .cta-box h2{
+        font-size:clamp(28px, 11vw, 42px);
+      }
+
+      .cta-box p{
+        font-size:15px;
+        line-height:1.7;
+      }
+
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .cta-actions .btn{
+        width:100%;
+      }
+
+      footer{
+        font-size:10px;
+        letter-spacing:.08em;
+        padding:20px 0 28px;
+      }
+
+      .modal{
+        padding:10px;
+      }
+
+      .modal-card{
+        border-radius:18px;
+      }
+
+      .modal-close{
+        top:10px;
+        right:10px;
+        width:38px;
+        height:38px;
+      }
+
+      .image-stage{
+        grid-template-columns:1fr;
+        min-height:auto;
+      }
+
+      .image-main{
+        padding:14px;
+      }
+
+      .image-main img{
+        max-height:55vh;
+        border-radius:14px;
+      }
+
+      .image-side{
+        padding:16px;
+        border-left:0;
+        border-top:1px solid rgba(255,255,255,.08);
+      }
+
+      .image-side h3{
+        font-size:20px;
+      }
+
+      .image-side p{
+        font-size:14px;
+      }
+
+      .thumbs{
+        grid-template-columns:repeat(3,1fr);
+        gap:8px;
       }
     }
   </style>
@@ -1507,9 +1939,7 @@
           <div>
             <div class="section-kicker mono">// official trailer system</div>
             <h2>Trailer & Gallery</h2>
-            <p>
-              新专辑预告片！
-            </p>
+            <p>新专辑预告片！</p>
           </div>
           <button class="btn btn-secondary" id="openTrailerMedia">Open Trailer</button>
         </div>
@@ -1525,13 +1955,12 @@
               <div class="trailer-bottom">
                 <div class="trailer-title">
                   <h3>Every Track Opens A New World</h3>
-                  <p>
-                    用一支预告片把专辑世界观、视觉风格与体验串联起来。
-                  </p>
+                  <p>用一支预告片把专辑世界观、视觉风格与体验串联起来。</p>
                 </div>
 
                 <button class="play-btn" id="openTrailerMain" aria-label="play trailer">
-                  <span>▶</span>
+                  <span class="play-icon">▶</span>
+                  <span class="play-text">播放预告片</span>
                 </button>
               </div>
             </div>
@@ -1644,7 +2073,7 @@
   </div>
 
   <script>
-    const TRAILER_URL = "https://player.bilibili.com/player.html?bvid=BV1tkwDzCEAW&autoplay=1"
+    const TRAILER_URL = "https://player.bilibili.com/player.html?bvid=BV1tkwDzCEAW&autoplay=1";
 
     const introLines = [
       "INITIALIZING NEW ALBUM EXPERIENCE...",
@@ -1776,9 +2205,9 @@
       function tick() {
         if (lineIndex >= introLines.length) return;
 
-        const prefix = introLines.slice(0, lineIndex).join("\n");
+        const prefix = introLines.slice(0, lineIndex).join("\\n");
         const current = introLines[lineIndex].slice(0, charIndex);
-        introText.innerHTML = `${prefix}${prefix ? "\n" : ""}${current}<span class="cursor">█</span>`;
+        introText.innerHTML = `${prefix}${prefix ? "\\n" : ""}${current}<span class="cursor">█</span>`;
 
         if (charIndex <= introLines[lineIndex].length) {
           charIndex++;
