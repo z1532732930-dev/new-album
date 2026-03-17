@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Album</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#050711;
+      --bg2:#0a1020;
+      --panel:rgba(11,16,31,.82);
+      --line:rgba(255,255,255,.08);
+      --text:#eef7ff;
+      --muted:#91a6bb;
+      --cyan:#00eaff;
+      --pink:#ff4d8d;
+      --purple:#b56bff;
+      --green:#12f7b6;
+      --blue:#5ca0ff;
+      --radius:24px;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --max:1280px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Rajdhani,system-ui,sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(0,234,255,.12), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(181,107,255,.10), transparent 24%),
+        radial-gradient(circle at 50% 80%, rgba(255,77,141,.08), transparent 20%),
+        linear-gradient(180deg,#050711 0%,#060a14 50%,#050711 100%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    a{text-decoration:none;color:inherit}
+    button{font:inherit}
+    img{display:block;max-width:100%}
+    .container{width:min(var(--max),calc(100% - 40px));margin:0 auto}
+    .mono{font-family:"Share Tech Mono",monospace}
+
+    .grid-overlay::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:-2;
+      background-image:
+        linear-gradient(rgba(0,234,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,234,255,.04) 1px, transparent 1px);
+      background-size:56px 56px;
+      mask-image:linear-gradient(180deg, rgba(255,255,255,.35), transparent 90%);
+    }
+
+    #bgCanvas{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:-1;
+      pointer-events:none;
+      opacity:.85;
+    }
+
+    /* Intro */
+    .intro{
+      position:fixed;
+      inset:0;
+      background:#02040a;
+      z-index:9999;
+      display:grid;
+      place-items:center;
+      transition:opacity .7s ease, visibility .7s ease;
+    }
+
+    .intro.hide{
+      opacity:0;
+      visibility:hidden;
+    }
+
+    .intro-card{
+      width:min(760px,calc(100% - 32px));
+      padding:32px;
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(9,14,28,.94), rgba(5,8,18,.98));
+      border:1px solid rgba(0,234,255,.18);
+      box-shadow:0 0 90px rgba(0,234,255,.12);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .intro-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, transparent, rgba(0,234,255,.09), transparent);
+      transform:translateX(-100%);
+      animation:scan 2.6s linear infinite;
+    }
+
+    @keyframes scan{to{transform:translateX(100%)}}
+
+    .intro-kicker{
+      color:var(--cyan);
+      font-size:12px;
+      letter-spacing:.3em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    .intro-title{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(34px,7vw,72px);
+      line-height:.95;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .intro-title span{
+      display:block;
+      color:var(--cyan);
+      text-shadow:0 0 24px rgba(0,234,255,.24);
+    }
+
+    .intro-text{
+      min-height:120px;
+      color:#cbe8fa;
+      line-height:1.9;
+      font-size:15px;
+      white-space:pre-wrap;
+    }
+
+    .cursor{animation:blink 1s infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    .intro-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .system-tags{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(0,234,255,.16);
+      background:rgba(0,234,255,.07);
+      color:var(--cyan);
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .btn{
+      position:relative;
+      overflow:hidden;
+      border-radius:16px;
+      padding:14px 22px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      cursor:pointer;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      font-weight:700;
+      transition:.22s ease;
+    }
+
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(120deg, transparent, rgba(255,255,255,.16), transparent);
+      transform:translateX(-100%);
+      transition:transform .48s ease;
+    }
+
+    .btn:hover::before{transform:translateX(100%)}
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 34px rgba(0,0,0,.28);
+    }
+
+    .btn-primary{
+      color:#021017;
+      background:linear-gradient(135deg,var(--cyan),#74d8ff 55%, var(--blue));
+      border-color:rgba(0,234,255,.22);
+      box-shadow:0 0 26px rgba(0,234,255,.2);
+    }
+
+    .btn-secondary{
+      color:var(--cyan);
+      border-color:rgba(0,234,255,.18);
+    }
+
+    /* Header */
+    header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:100;
+      transition:.25s ease;
+      border-bottom:1px solid transparent;
+    }
+
+    header.scrolled{
+      background:rgba(5,9,19,.82);
+      backdrop-filter:blur(18px);
+      border-color:rgba(0,234,255,.1);
+      box-shadow:0 12px 30px rgba(0,0,0,.28);
+    }
+
+    .nav{
+      height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-box{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(0,234,255,.34);
+      display:grid;
+      place-items:center;
+      transform:rotate(45deg);
+      background:linear-gradient(180deg, rgba(0,234,255,.12), rgba(92,160,255,.08));
+      box-shadow:0 0 20px rgba(0,234,255,.16);
+    }
+
+    .brand-box i{
+      width:14px;
+      height:14px;
+      background:linear-gradient(135deg,var(--cyan),var(--blue));
+      display:block;
+    }
+
+    .brand-text strong{
+      display:block;
+      font-family:Orbitron,sans-serif;
+      color:var(--cyan);
+      letter-spacing:.32em;
+      font-size:16px;
+      text-shadow:0 0 20px rgba(0,234,255,.22);
+    }
+
+    .brand-text span{
+      display:block;
+      font-size:11px;
+      letter-spacing:.26em;
+      color:var(--muted);
+      margin-top:4px;
+      text-transform:uppercase;
+    }
+
+    .nav-links{
+      display:flex;
+      gap:24px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .nav-links a{
+      font-family:Orbitron,sans-serif;
+      font-size:12px;
+      letter-spacing:.2em;
+      color:#9bb0c3;
+      position:relative;
+      transition:.2s;
+    }
+
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-8px;
+      width:0;
+      height:2px;
+      background:linear-gradient(90deg,var(--cyan),var(--blue));
+      transition:width .22s ease;
+      box-shadow:0 0 12px rgba(0,234,255,.35);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active{
+      color:var(--cyan);
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after{
+      width:100%;
+    }
+
+    .nav-actions{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    main{padding-top:76px}
+    section{position:relative}
+    .section-pad{padding:96px 0}
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:28px;
+    }
+
+    .section-kicker{
+      color:var(--cyan);
+      font-size:12px;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .section-head h2{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(30px,5vw,54px);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      line-height:1;
+      margin-bottom:10px;
+    }
+
+    .section-head p{
+      max-width:760px;
+      color:#9bb2c6;
+      font-size:18px;
+      line-height:1.55;
+    }
+
+    /* Hero */
+    .hero{
+      min-height:calc(100vh - 76px);
+      display:grid;
+      align-items:center;
+    }
+
+    .hero-inner{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:42px;
+      align-items:center;
+      padding:70px 0 40px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      color:var(--cyan);
+      font-size:12px;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after{
+      content:"";
+      width:40px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,var(--cyan));
+    }
+
+    .eyebrow::after{
+      background:linear-gradient(90deg,var(--cyan),transparent);
+    }
+
+    .headline{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(52px,9vw,108px);
+      line-height:.94;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+      position:relative;
+    }
+
+    .headline .accent{
+      display:block;
+      color:var(--cyan);
+      position:relative;
+      text-shadow:0 0 26px rgba(0,234,255,.26);
+    }
+
+    .headline .sub{
+      display:block;
+      color:#f7fbff;
+    }
+
+    .gl1,.gl2{
+      position:absolute;
+      left:0;
+      top:0;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .headline.glitching .gl1{
+      opacity:.7;
+      color:var(--pink);
+      transform:translate(3px,-1px);
+      clip-path:inset(18% 0 52% 0);
+    }
+
+    .headline.glitching .gl2{
+      opacity:.7;
+      color:var(--green);
+      transform:translate(-3px,2px);
+      clip-path:inset(60% 0 10% 0);
+    }
+
+    .headline-note{
+      color:#8ba7bf;
+      font-size:12px;
+      letter-spacing:.3em;
+      text-transform:uppercase;
+      margin-bottom:24px;
+    }
+
+    .hero-copy{
+      max-width:620px;
+      font-size:20px;
+      line-height:1.55;
+      color:#bfd0df;
+      margin-bottom:28px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:34px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      max-width:760px;
+    }
+
+    .stat-card{
+      padding:18px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border:1px solid rgba(0,234,255,.08);
+    }
+
+    .stat-card strong{
+      display:block;
+      font-family:Orbitron,sans-serif;
+      font-size:30px;
+      color:var(--cyan);
+      text-shadow:0 0 16px rgba(0,234,255,.22);
+    }
+
+    .stat-card span{
+      display:block;
+      margin-top:6px;
+      color:#90a5b8;
+      font-size:13px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .hero-panel{
+      min-height:640px;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+
+    .hero-rings{
+      position:absolute;
+      width:560px;
+      aspect-ratio:1;
+      border-radius:50%;
+      border:1px solid rgba(0,234,255,.1);
+      animation:spin 28s linear infinite;
+    }
+
+    .hero-rings::before,
+    .hero-rings::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      inset:36px;
+      border:1px solid rgba(181,107,255,.1);
+    }
+
+    .hero-rings::after{
+      inset:90px;
+      border-color:rgba(255,77,141,.1);
+      animation:spin 14s linear infinite reverse;
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .album-card{
+      width:min(480px,100%);
+      border-radius:28px;
+      padding:24px;
+      background:linear-gradient(180deg, rgba(11,17,31,.88), rgba(7,10,20,.9));
+      border:1px solid rgba(0,234,255,.12);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .album-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(0,234,255,.12), transparent 35%, transparent 60%, rgba(255,77,141,.08));
+      pointer-events:none;
+    }
+
+    .album-cover{
+      position:relative;
+      z-index:1;
+      border-radius:22px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      margin-bottom:18px;
+      aspect-ratio:1;
+      background:#101726;
+    }
+
+    .album-cover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .album-meta{
+      position:relative;
+      z-index:1;
+    }
+
+    .album-chip{
+      display:inline-flex;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(0,234,255,.08);
+      border:1px solid rgba(0,234,255,.18);
+      color:var(--cyan);
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .album-meta h3{
+      font-family:Orbitron,sans-serif;
+      font-size:28px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .album-meta p{
+      color:#a4bbcf;
+      font-size:16px;
+      line-height:1.55;
+      margin-bottom:16px;
+    }
+
+    .album-track-tags{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .album-track-tags span{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      color:#d6e8f5;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    /* Flow */
+    .flow-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .flow-card{
+      padding:24px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .flow-step{
+      display:inline-grid;
+      place-items:center;
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:rgba(0,234,255,.08);
+      border:1px solid rgba(0,234,255,.18);
+      color:var(--cyan);
+      font-family:Orbitron,sans-serif;
+      margin-bottom:16px;
+    }
+
+    .flow-card h3{
+      font-family:Orbitron,sans-serif;
+      font-size:20px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .flow-card p{
+      color:#9eb5c8;
+      font-size:16px;
+      line-height:1.55;
+    }
+
+    /* Video */
+    .media-shell{
+      padding:24px;
+      border-radius:30px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid rgba(0,234,255,.08);
+    }
+
+    .trailer-box{
+      position:relative;
+      aspect-ratio:16/9;
+      border-radius:26px;
+      overflow:hidden;
+      border:1px solid rgba(255,77,141,.18);
+      background:
+        linear-gradient(180deg, rgba(6,10,20,.15), rgba(6,10,20,.5)),
+        url('https://th.bing.com/th/id/R.f47f78c690f2e54a9ce957e9ea483c9a?rik=lRfGE77NZHFbLw&riu=http%3a%2f%2fi0.hdslb.com%2fbfs%2farchive%2ff5f2fd8ef320b5e051dcaf73d1350a62e6240906.jpg&ehk=6Euhe0jORnJ3HZv3J67Fe5kC0124cZ8vZHnRMeOlFaY%3d&risl=&pid=ImgRaw&r=0') center/cover;
+    }
+
+    .trailer-box::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.52));
+    }
+
+    .trailer-content{
+      position:absolute;
+      inset:20px;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .trailer-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .trailer-title h3{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(28px,3vw,42px);
+      margin-bottom:10px;
+      line-height:1.08;
+      text-transform:uppercase;
+    }
+
+    .trailer-title p{
+      max-width:560px;
+      color:#d5e7f3;
+      font-size:17px;
+      line-height:1.5;
+    }
+
+    .trailer-bottom{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .play-btn{
+      width:88px;
+      height:88px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.2);
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.2), rgba(255,77,141,.3));
+      display:grid;
+      place-items:center;
+      box-shadow:0 0 36px rgba(255,77,141,.28);
+      cursor:pointer;
+      transition:.22s ease;
+      backdrop-filter:blur(10px);
+    }
+
+    .play-btn:hover{
+      transform:scale(1.06);
+      box-shadow:0 0 48px rgba(255,77,141,.36);
+    }
+
+    .play-btn span{
+      font-size:28px;
+      margin-left:5px;
+    }
+
+    .gallery-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin:26px 0 14px;
+    }
+
+    .gallery-controls{
+      display:flex;
+      gap:10px;
+    }
+
+    .icon-btn{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      border:1px solid rgba(0,234,255,.14);
+      background:rgba(255,255,255,.03);
+      color:var(--cyan);
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .icon-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 20px rgba(0,234,255,.16);
+    }
+
+    .carousel{
+      overflow:hidden;
+      border-radius:24px;
+    }
+
+    .track{
+      display:flex;
+      gap:16px;
+      transition:transform .45s ease;
+    }
+
+    .shot{
+      min-width:calc((100% - 32px)/3);
+      aspect-ratio:16/10;
+      border-radius:24px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,.08);
+      background:#0e1222;
+      cursor:pointer;
+      transition:.24s;
+    }
+
+    .shot:hover{
+      transform:translateY(-4px);
+      box-shadow:0 18px 34px rgba(0,0,0,.3);
+      border-color:rgba(0,234,255,.18);
+    }
+
+    .shot img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .shot::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.42));
+      z-index:1;
+    }
+
+    .shot-info{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:2;
+      padding:20px;
+      background:linear-gradient(180deg, transparent, rgba(0,0,0,.74));
+    }
+
+    .shot-info strong{
+      display:block;
+      font-family:Orbitron,sans-serif;
+      font-size:18px;
+      margin-bottom:6px;
+    }
+
+    .shot-info span{
+      color:#b7cddd;
+      font-size:14px;
+    }
+
+    /* Character selector */
+    .char-layout{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    .char-tabs{
+      display:grid;
+      gap:12px;
+      position:sticky;
+      top:96px;
+    }
+
+    .char-tab{
+      width:100%;
+      text-align:left;
+      padding:16px 18px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      color:#d2e5f4;
+      cursor:pointer;
+      transition:.24s;
+    }
+
+    .char-tab:hover,
+    .char-tab.active{
+      transform:translateX(4px);
+      box-shadow:0 18px 30px rgba(0,0,0,.22);
+    }
+
+    .char-tab small{
+      display:block;
+      font-size:11px;
+      letter-spacing:.2em;
+      color:#8fa6ba;
+      margin-bottom:4px;
+      text-transform:uppercase;
+    }
+
+    .char-tab strong{
+      display:block;
+      font-family:Orbitron,sans-serif;
+      font-size:22px;
+      margin-bottom:4px;
+    }
+
+    .char-tab span{
+      font-size:15px;
+      color:#b4cadb;
+    }
+
+    .char-panel{
+      --accent:var(--cyan);
+      padding:28px;
+      border-radius:30px;
+      background:linear-gradient(180deg, rgba(13,18,33,.86), rgba(8,12,22,.86));
+      border:1px solid rgba(255,255,255,.08);
+      min-height:620px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .char-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 28%);
+      pointer-events:none;
+    }
+
+    .char-panel-inner{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:26px;
+      align-items:center;
+    }
+
+    .char-portrait{
+      position:relative;
+      min-height:520px;
+      border-radius:28px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      background:radial-gradient(circle at 50% 25%, color-mix(in srgb, var(--accent) 24%, #10182d 76%), #09101d 60%, #050812 100%);
+      display:grid;
+      place-items:center;
+      padding:20px;
+    }
+
+    .char-ring,
+    .char-ring::before,
+    .char-ring::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    }
+
+    .char-ring{
+      inset:48px;
+      animation:spin 18s linear infinite;
+    }
+
+    .char-ring::before{
+      inset:28px;
+      animation:spin 12s linear infinite reverse;
+    }
+
+    .char-ring::after{
+      inset:74px;
+      animation:spin 9s linear infinite;
+    }
+
+    .char-photo{
+      position:relative;
+      z-index:1;
+      width:min(90%,360px);
+      aspect-ratio:4/5;
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      box-shadow:0 24px 50px rgba(0,0,0,.34), 0 0 28px color-mix(in srgb, var(--accent) 18%, transparent);
+      background:#101726;
+    }
+
+    .char-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .char-symbol{
+      position:absolute;
+      right:18px;
+      bottom:12px;
+      font-size:120px;
+      line-height:1;
+      color:color-mix(in srgb, var(--accent) 24%, transparent);
+      z-index:1;
+      font-weight:700;
+    }
+
+    .char-meta{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      align-self:flex-start;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      background:color-mix(in srgb, var(--accent) 10%, transparent);
+      color:var(--accent);
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-family:"Share Tech Mono",monospace;
+    }
+
+    .char-name{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(34px,5vw,62px);
+      line-height:.95;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--accent);
+      text-shadow:0 0 22px color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+
+    .char-role{
+      font-size:18px;
+      color:#dceaf5;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .char-desc{
+      color:#b7cadb;
+      font-size:18px;
+      line-height:1.6;
+      max-width:540px;
+    }
+
+    .char-tags{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:#cfe1ef;
+      font-size:13px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .bars{
+      display:grid;
+      gap:12px;
+      margin-top:4px;
+    }
+
+    .bar-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:6px;
+      font-family:"Share Tech Mono",monospace;
+      font-size:13px;
+      color:#9cb2c5;
+      letter-spacing:.08em;
+    }
+
+    .bar-track{
+      height:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.04);
+    }
+
+    .bar-fill{
+      height:100%;
+      width:0;
+      border-radius:inherit;
+      transition:width .7s ease;
+      box-shadow:0 0 14px color-mix(in srgb, var(--accent) 24%, transparent);
+      background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 50%, #fff), var(--accent));
+    }
+
+    /* CTA */
+    .cta-box{
+      position:relative;
+      overflow:hidden;
+      border-radius:34px;
+      padding:54px 28px;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(0,234,255,.18), transparent 32%),
+        linear-gradient(180deg, rgba(11, 18, 34, .9), rgba(7, 11, 21, .95));
+      border:1px solid rgba(0,234,255,.12);
+      box-shadow:0 28px 80px rgba(0,0,0,.36);
+      text-align:center;
+    }
+
+    .cta-box::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(120deg, transparent, rgba(255,255,255,.06), transparent);
+      transform:translateX(-100%);
+      animation:scan 5s linear infinite;
+    }
+
+    .cta-box h2{
+      font-family:Orbitron,sans-serif;
+      font-size:clamp(34px,6vw,72px);
+      line-height:1;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    .cta-box p{
+      color:#b6cadb;
+      max-width:760px;
+      margin:0 auto 28px;
+      font-size:18px;
+      line-height:1.55;
+      position:relative;
+      z-index:1;
+    }
+
+    .cta-actions{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+
+    footer{
+      padding:28px 0 42px;
+      text-align:center;
+      color:#6f8498;
+      font-family:"Share Tech Mono",monospace;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+
+    /* Modals */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(2, 6, 14, .84);
+      backdrop-filter:blur(12px);
+      display:grid;
+      place-items:center;
+      opacity:0;
+      visibility:hidden;
+      transition:.26s ease;
+      z-index:200;
+      padding:20px;
+    }
+
+    .modal.show{
+      opacity:1;
+      visibility:visible;
+    }
+
+    .modal-card{
+      width:min(1100px, 100%);
+      background:linear-gradient(180deg, rgba(10,16,30,.96), rgba(6,10,20,.98));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:26px;
+      overflow:hidden;
+      box-shadow:0 30px 80px rgba(0,0,0,.5);
+      position:relative;
+    }
+
+    .modal-close{
+      position:absolute;
+      right:16px;
+      top:16px;
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:white;
+      z-index:2;
+      cursor:pointer;
+    }
+
+    .video-wrap{
+      aspect-ratio:16/9;
+      background:black;
+    }
+
+    .video-wrap iframe{
+      width:100%;
+      height:100%;
+      border:0;
+    }
+
+    .image-modal .modal-card{
+      width:min(1200px,100%);
+      background:#03060d;
+    }
+
+    .image-stage{
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr 320px;
+      min-height:620px;
+    }
+
+    .image-main{
+      position:relative;
+      background:#050913;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .image-main img{
+      max-height:76vh;
+      width:auto;
+      max-width:100%;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .image-side{
+      border-left:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      padding:26px;
+    }
+
+    .image-side h3{
+      font-family:Orbitron,sans-serif;
+      font-size:26px;
+      margin-bottom:10px;
+      line-height:1.08;
+    }
+
+    .image-side p{
+      color:#9db4c7;
+      line-height:1.6;
+      font-size:16px;
+      margin-bottom:18px;
+    }
+
+    .thumbs{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+
+    .thumb{
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      cursor:pointer;
+      opacity:.8;
+      transition:.2s ease;
+      background:none;
+      padding:0;
+    }
+
+    .thumb.active,
+    .thumb:hover{
+      opacity:1;
+      transform:translateY(-2px);
+      border-color:rgba(0,234,255,.24);
+    }
+
+    .thumb img{
+      aspect-ratio:4/3;
+      object-fit:cover;
+      width:100%;
+    }
+
+    @media (max-width:1100px){
+      .hero-inner,
+      .char-panel-inner,
+      .char-layout,
+      .image-stage{
+        grid-template-columns:1fr;
+      }
+
+      .char-tabs{
+        position:static;
+      }
+
+      .hero-panel{
+        min-height:520px;
+      }
+
+      .hero-rings{
+        width:460px;
+      }
+
+      .flow-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .shot{
+        min-width:calc((100% - 16px)/2);
+      }
+
+      .image-side{
+        border-left:0;
+        border-top:1px solid rgba(255,255,255,.08);
+      }
+    }
+
+    @media (max-width:820px){
+      .nav-links{
+        display:none;
+      }
+
+      .hero-stats,
+      .flow-grid{
+        grid-template-columns:1fr;
+      }
+
+      .shot{
+        min-width:100%;
+      }
+
+      .hero-copy{
+        font-size:18px;
+      }
+
+      .hero-inner{
+        padding-top:42px;
+      }
+
+      .trailer-bottom{
+        align-items:flex-start;
+      }
+    }
+  </style>
+</head>
+<body class="grid-overlay">
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Intro -->
+  <div class="intro" id="intro">
+    <div class="intro-card">
+      <div class="intro-kicker mono">official access sequence</div>
+      <h1 class="intro-title">New <span>Album</span></h1>
+      <div class="intro-text mono" id="introText"></div>
+      <div class="intro-actions">
+        <div class="system-tags">
+          <span class="tag mono">visual mode online</span>
+          <span class="tag mono">audio signal locked</span>
+          <span class="tag mono">album protocol ready</span>
+        </div>
+        <button class="btn btn-primary" id="enterBtn">Enter New Album</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header id="siteHeader">
+    <div class="container nav">
+      <a class="brand" href="#home">
+        <span class="brand-box"><i></i></span>
+        <span class="brand-text">
+          <strong>NEW</strong>
+          <span>album experience</span>
+        </span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#home" class="active">HOME</a>
+        <a href="#flow">FLOW</a>
+        <a href="#media">VIDEO</a>
+        <a href="#characters">CAST</a>
+        <a href="#cta">ENTER</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary" id="openTrailerTop">Watch Trailer</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="home">
+      <div class="container hero-inner">
+        <div>
+          <div class="eyebrow mono">New Era · New Visual Narrative</div>
+
+          <h1 class="headline" id="headline">
+            <span class="accent">
+              NEW
+              <span class="gl1">NEW</span>
+              <span class="gl2">NEW</span>
+            </span>
+            <span class="sub">ALBUM</span>
+          </h1>
+
+          <div class="headline-note mono">immersive music concept landing page</div>
+
+          <p class="hero-copy">
+            这不是普通的专辑宣传页，而是一段带有节奏的沉浸式体验：
+            先进入系统，再观看预告，再认识角色，最后进入专辑世界。
+            一起把将 <strong style="color:var(--cyan)">旋律、音符、节奏</strong> 融入生活。
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary">Listen Now</button>
+            <button class="btn btn-secondary" id="openTrailerHero">Play Trailer</button>
+          </div>
+
+          <div class="hero-stats">
+            <article class="stat-card">
+              <strong>12</strong>
+              <span>Tracks</span>
+            </article>
+            <article class="stat-card">
+              <strong>04</strong>
+              <span>Characters</span>
+            </article>
+            <article class="stat-card">
+              <strong>4K</strong>
+              <span>Visual Teaser</span>
+            </article>
+            <article class="stat-card">
+              <strong>360°</strong>
+              <span>World Build</span>
+            </article>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="hero-rings"></div>
+
+          <div class="album-card">
+            <div class="album-cover">
+              <img src="https://tse3.mm.bing.net/th/id/OIP.USMVYil2Y8XnTTIaEpZ1UgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="New Album Cover">
+            </div>
+
+            <div class="album-meta">
+              <span class="album-chip mono">featured release</span>
+              <h3>New Album</h3>
+              <p>
+                将电子氛围、赛博视觉和角色叙事整合成一个完整的专辑世界。
+                这一屏作为视觉入口，负责定调，不抢走后面视频和角色系统的戏份。
+              </p>
+              <div class="album-track-tags">
+                <span>Future Pop</span>
+                <span>Neon Visual</span>
+                <span>Concept Story</span>
+                <span>Live Experience</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flow -->
+    <section class="section-pad" id="flow">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker mono">// correct pacing and flow</div>
+            <h2>Three-Step Experience</h2>
+            <p>
+              营造氛围，再释放情感。这就是你要的正确节奏：
+              A 进入动画“仪式感”，B 视频“情绪拉升”，C 歌迷的“交互记忆点”。
+            </p>
+          </div>
+        </div>
+
+        <div class="flow-grid">
+          <article class="flow-card">
+            <div class="flow-step">A</div>
+            <h3>Enter</h3>
+            <p>通过启动动画和进入按钮，让用户先感受到“进入专辑世界”的仪式。</p>
+          </article>
+
+          <article class="flow-card">
+            <div class="flow-step">B</div>
+            <h3>Trailer</h3>
+            <p>用预告片承接首页情绪，把静态视觉转成动态氛围，这是整页的第一次情绪爆发点。</p>
+          </article>
+
+          <article class="flow-card">
+            <div class="flow-step">C</div>
+            <h3>Characters</h3>
+            <p>最后进入专辑选择区，让用户不只是看，而是“参与”，形成真正的记忆点和沉浸感。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video -->
+    <section class="section-pad" id="media">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker mono">// official trailer system</div>
+            <h2>Trailer & Gallery</h2>
+            <p>
+              新专辑预告片！
+            </p>
+          </div>
+          <button class="btn btn-secondary" id="openTrailerMedia">Open Trailer</button>
+        </div>
+
+        <div class="media-shell">
+          <div class="trailer-box">
+            <div class="trailer-content">
+              <div class="trailer-top">
+                <span class="tag mono">official teaser</span>
+                <span class="tag mono" style="border-color:rgba(255,77,141,.22);background:rgba(255,77,141,.14);color:#ffd4e5;">4K · 02:18</span>
+              </div>
+
+              <div class="trailer-bottom">
+                <div class="trailer-title">
+                  <h3>Every Track Opens A New World</h3>
+                  <p>
+                    用一支预告片把专辑世界观、视觉风格与体验串联起来。
+                  </p>
+                </div>
+
+                <button class="play-btn" id="openTrailerMain" aria-label="play trailer">
+                  <span>▶</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-head">
+            <div>
+              <div class="section-kicker mono" style="margin-bottom:6px;color:var(--pink)">// visual gallery</div>
+              <h3 style="font-family:Orbitron,sans-serif;letter-spacing:.08em;font-size:26px;text-transform:uppercase;">Album Frames</h3>
+            </div>
+            <div class="gallery-controls">
+              <button class="icon-btn" id="prevShot">←</button>
+              <button class="icon-btn" id="nextShot">→</button>
+            </div>
+          </div>
+
+          <div class="carousel">
+            <div class="track" id="shotTrack"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Characters -->
+    <section class="section-pad" id="characters">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker mono">// interactive cast system</div>
+            <h2>Character Selection</h2>
+            <p>
+              这一段是整页最后的交互高潮。角色卡不放在前面，是因为它属于“深度参与”，应该出现在用户已经看完氛围和视频之后。
+            </p>
+          </div>
+        </div>
+
+        <div class="char-layout">
+          <div class="char-tabs" id="charTabs"></div>
+
+          <div class="char-panel" id="charPanel">
+            <div class="char-panel-inner">
+              <div class="char-portrait">
+                <div class="char-ring"></div>
+                <div class="char-photo">
+                  <img id="charImage" alt="character">
+                </div>
+                <div class="char-symbol" id="charSymbol">◈</div>
+              </div>
+
+              <div class="char-meta">
+                <div class="chip" id="charFaction">DIGITAL GHOST</div>
+                <h3 class="char-name" id="charName">NOVA-7</h3>
+                <div class="char-role" id="charRole">量子黑客</div>
+                <p class="char-desc" id="charDesc"></p>
+                <div class="char-tags" id="charTags"></div>
+                <div class="bars" id="charBars"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section-pad" id="cta">
+      <div class="container">
+        <div class="cta-box">
+          <div class="section-kicker mono">// enter the release</div>
+          <h2>Ready For New Album?</h2>
+          <p>
+            开启新专辑的预约吧！
+            走进音乐的World
+          </p>
+          <div class="cta-actions">
+            <button class="btn btn-primary">Listen Now</button>
+            <button class="btn btn-secondary" id="openTrailerBottom">Watch Again</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © New Album · Official Experience Page
+  </footer>
+
+  <!-- Video Modal -->
+  <div class="modal" id="videoModal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="videoModal">✕</button>
+      <div class="video-wrap" id="videoWrap"></div>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div class="modal image-modal" id="imageModal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="imageModal">✕</button>
+      <div class="image-stage">
+        <div class="image-main">
+          <img id="imageMain" alt="gallery">
+        </div>
+        <aside class="image-side">
+          <h3 id="imageTitle"></h3>
+          <p id="imageDesc"></p>
+          <div class="thumbs" id="thumbs"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TRAILER_URL = "https://www.bilibili.com/video/BV1tkwDzCEAW/?share_source=copy_web&vd_source=3aebab55c0f231e55f1a981388a4d069";
+
+    const introLines = [
+      "INITIALIZING NEW ALBUM EXPERIENCE...",
+      "SYNCING VISUAL SIGNAL...",
+      "LOADING TRAILER SEQUENCE...",
+      "CHARACTER DATABASE READY",
+      "WELCOME TO NEW ALBUM"
+    ];
+
+    const screenshots = [
+      {
+        title: "Neon Opening",
+        subtitle: "Intro Frame",
+        desc: "作为开场视觉的氛围图，负责建立音乐世界的第一印象。",
+        image: "https://haowallpaper.com/link/common/file/getCroppingImg/16545331582127488"
+      },
+      {
+        title: "Stage Pulse",
+        subtitle: "Live Energy",
+        desc: "把演出感和视觉叙事结合，让专辑不只是音乐，而是完整体验。",
+        image: "https://pic.rmb.bdstatic.com/0a638e39573ec4eba5bbef0345a92585.jpeg"
+      },
+      {
+        title: "Signal Lights",
+        subtitle: "Visual Identity",
+        desc: "用灯光和色彩统一整张专辑的品牌风格和视觉语言。",
+        image: "https://pica.zhimg.com/v2-1c8dc8510f2720ff737aae5902c155a4_1440w.jpg"
+      },
+      {
+        title: "Night Crowd",
+        subtitle: "World Scene",
+        desc: "把用户从观看者变成现场参与者，形成更强的代入感。",
+        image: "https://tse3.mm.bing.net/th/id/OIP.LOfr1UNSvOFYVzqvSt4sYQHaEo?rs=1&pid=ImgDetMain&o=7&rm=3"
+      },
+      {
+        title: "Future Tone",
+        subtitle: "Concept Visual",
+        desc: "保持未来感与情绪感并存，让页面像作品集而不是普通宣传图册。",
+        image: "https://picx.zhimg.com/v2-0c516e86d8147f03134122072b1d2d5b_1440w.jpg"
+      },
+      {
+        title: "Final Echo",
+        subtitle: "Closing Frame",
+        desc: "作为页面收尾视觉，承接 CTA，让用户愿意继续点击和探索。",
+        image: "https://tse4.mm.bing.net/th/id/OIP.kTrIfpi5h18OWz27FFpRJgHaEL?rs=1&pid=ImgDetMain&o=7&rm=3"
+      }
+    ];
+
+    const characters = [
+      {
+        name: "最伟大的作品",
+        role: "量子黑客",
+        faction: "Digital Ghost",
+        color: "#00eaff",
+        symbol: "◈",
+        image: "https://static.wikia.nocookie.net/discogs/images/9/92/CH-0332.webp/revision/latest?cb=20240611142804&path-prefix=zh",
+        desc: "负责电子段落与数据噪点主题，是整张专辑中最冷静也最危险的角色，代表信息、速度和失控。",
+        tags: ["Glitch", "Cyber", "Cold", "Signal"],
+        stats: { 氛围: 75, 能量: 60, 神秘: 99, 速度: 88 }
+      },
+      {
+        name: "我是如此相信",
+        role: "机甲战士",
+        faction: "Iron Legion",
+        color: "#ff4d8d",
+        symbol: "⬡",
+        image: "https://www.bing.com/th/id/OIP.TgyvUMkyCx1mpkJyhybVRAHaHa?w=215&h=215&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3",
+        desc: "对应专辑中最有冲击力的节奏段落，力量感、鼓点感和爆发力都由他来承接。",
+        tags: ["Heavy", "Power", "Drum", "Impact"],
+        stats: { 氛围: 92, 能量: 97, 神秘: 30, 速度: 55 }
+      },
+      {
+        name: "说好不哭",
+        role: "神经女巫",
+        faction: "Void Chapel",
+        color: "#b56bff",
+        symbol: "✦",
+        image: "https://pic2.zhimg.com/v2-5b9de1d48ee943f3c8fde04035a58bd5_r.jpg",
+        desc: "负责空灵、迷幻和超现实段落，她让专辑的声音更像梦境，而不是单纯的流行旋律。",
+        tags: ["Dream", "Mystic", "Echo", "Ritual"],
+        stats: { 氛围: 88, 能量: 45, 神秘: 95, 速度: 72 }
+      },
+      {
+        name: "床边的故事",
+        role: "影子刺客",
+        faction: "Night Division",
+        color: "#12f7b6",
+        symbol: "◇",
+        image: "https://www.bing.com/th/id/OIP.kRMjytXmYe9bRhiE8IbMkQHaHa?w=189&h=189&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3",
+        desc: "代表专辑里最锋利、最利落的部分，适合承担转场、节奏突袭和最具记忆点的 hook。",
+        tags: ["Sharp", "Fast", "Hook", "Night"],
+        stats: { 氛围: 91, 能量: 78, 神秘: 65, 速度: 99 }
+      }
+    ];
+
+    const intro = document.getElementById("intro");
+    const introText = document.getElementById("introText");
+    const enterBtn = document.getElementById("enterBtn");
+    const header = document.getElementById("siteHeader");
+    const headline = document.getElementById("headline");
+    const shotTrack = document.getElementById("shotTrack");
+    const charTabs = document.getElementById("charTabs");
+    const charPanel = document.getElementById("charPanel");
+    const charImage = document.getElementById("charImage");
+    const charSymbol = document.getElementById("charSymbol");
+    const charFaction = document.getElementById("charFaction");
+    const charName = document.getElementById("charName");
+    const charRole = document.getElementById("charRole");
+    const charDesc = document.getElementById("charDesc");
+    const charTags = document.getElementById("charTags");
+    const charBars = document.getElementById("charBars");
+
+    const videoModal = document.getElementById("videoModal");
+    const videoWrap = document.getElementById("videoWrap");
+
+    const imageModal = document.getElementById("imageModal");
+    const imageMain = document.getElementById("imageMain");
+    const imageTitle = document.getElementById("imageTitle");
+    const imageDesc = document.getElementById("imageDesc");
+    const thumbs = document.getElementById("thumbs");
+
+    let currentShot = 0;
+    let currentChar = 0;
+
+    function typeIntro() {
+      let lineIndex = 0;
+      let charIndex = 0;
+
+      function tick() {
+        if (lineIndex >= introLines.length) return;
+
+        const prefix = introLines.slice(0, lineIndex).join("\n");
+        const current = introLines[lineIndex].slice(0, charIndex);
+        introText.innerHTML = `${prefix}${prefix ? "\n" : ""}${current}<span class="cursor">█</span>`;
+
+        if (charIndex <= introLines[lineIndex].length) {
+          charIndex++;
+          setTimeout(tick, 28);
+        } else {
+          lineIndex++;
+          charIndex = 0;
+          setTimeout(tick, 180);
+        }
+      }
+
+      tick();
+    }
+
+    typeIntro();
+
+    enterBtn.addEventListener("click", () => {
+      intro.classList.add("hide");
+    });
+
+    function initHeader() {
+      window.addEventListener("scroll", () => {
+        header.classList.toggle("scrolled", window.scrollY > 8);
+      });
+    }
+
+    function initHeadlineGlitch() {
+      setInterval(() => {
+        headline.classList.add("glitching");
+        setTimeout(() => headline.classList.remove("glitching"), 160);
+      }, 3200);
+    }
+
+    function renderShots() {
+      shotTrack.innerHTML = screenshots.map((item, i) => `
+        <article class="shot" data-shot="${i}">
+          <img src="${item.image}" alt="${item.title}">
+          <div class="shot-info">
+            <strong>${item.title}</strong>
+            <span>${item.subtitle}</span>
+          </div>
+        </article>
+      `).join("");
+
+      [...document.querySelectorAll(".shot")].forEach(card => {
+        card.addEventListener("click", () => openImageModal(Number(card.dataset.shot)));
+      });
+
+      updateTrack();
+    }
+
+    function getVisibleShots() {
+      if (window.innerWidth <= 820) return 1;
+      if (window.innerWidth <= 1100) return 2;
+      return 3;
+    }
+
+    function updateTrack() {
+      const visible = getVisibleShots();
+      const gap = 16;
+      const width = shotTrack.parentElement.clientWidth;
+      const itemWidth = (width - gap * (visible - 1)) / visible;
+      const offset = currentShot * (itemWidth + gap);
+      shotTrack.style.transform = `translateX(-${offset}px)`;
+    }
+
+    function nextShot() {
+      const visible = getVisibleShots();
+      const max = Math.max(0, screenshots.length - visible);
+      currentShot = currentShot >= max ? 0 : currentShot + 1;
+      updateTrack();
+    }
+
+    function prevShot() {
+      const visible = getVisibleShots();
+      const max = Math.max(0, screenshots.length - visible);
+      currentShot = currentShot <= 0 ? max : currentShot - 1;
+      updateTrack();
+    }
+
+    document.getElementById("nextShot").addEventListener("click", nextShot);
+    document.getElementById("prevShot").addEventListener("click", prevShot);
+
+    let autoShot = setInterval(nextShot, 3800);
+
+    shotTrack.addEventListener("mouseenter", () => clearInterval(autoShot));
+    shotTrack.addEventListener("mouseleave", () => autoShot = setInterval(nextShot, 3800));
+
+    function openVideoModal() {
+      videoWrap.innerHTML = `<iframe src="${TRAILER_URL}" title="Trailer" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      videoModal.classList.add("show");
+    }
+
+    function closeVideoModal() {
+      videoWrap.innerHTML = "";
+      videoModal.classList.remove("show");
+    }
+
+    ["openTrailerTop", "openTrailerHero", "openTrailerMedia", "openTrailerMain", "openTrailerBottom"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("click", openVideoModal);
+    });
+
+    document.querySelectorAll('[data-close="videoModal"]').forEach(btn => {
+      btn.addEventListener("click", closeVideoModal);
+    });
+
+    videoModal.addEventListener("click", e => {
+      if (e.target === videoModal) closeVideoModal();
+    });
+
+    function openImageModal(index) {
+      const item = screenshots[index];
+      imageMain.src = item.image;
+      imageTitle.textContent = item.title;
+      imageDesc.textContent = item.desc;
+
+      thumbs.innerHTML = screenshots.map((s, i) => `
+        <button class="thumb ${i === index ? "active" : ""}" data-thumb="${i}">
+          <img src="${s.image}" alt="${s.title}">
+        </button>
+      `).join("");
+
+      [...thumbs.querySelectorAll(".thumb")].forEach(btn => {
+        btn.addEventListener("click", () => openImageModal(Number(btn.dataset.thumb)));
+      });
+
+      imageModal.classList.add("show");
+    }
+
+    function closeImageModal() {
+      imageModal.classList.remove("show");
+    }
+
+    document.querySelectorAll('[data-close="imageModal"]').forEach(btn => {
+      btn.addEventListener("click", closeImageModal);
+    });
+
+    imageModal.addEventListener("click", e => {
+      if (e.target === imageModal) closeImageModal();
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        closeVideoModal();
+        closeImageModal();
+      }
+    });
+
+    function renderCharTabs() {
+      charTabs.innerHTML = characters.map((char, i) => `
+        <button class="char-tab ${i === currentChar ? "active" : ""}" data-char="${i}" style="${i === currentChar ? `border-color:${char.color}55; background:linear-gradient(180deg, color-mix(in srgb, ${char.color} 12%, rgba(255,255,255,.03)), rgba(255,255,255,.02));` : ""}">
+          <small>${char.faction}</small>
+          <strong style="${i === currentChar ? `color:${char.color}; text-shadow:0 0 18px color-mix(in srgb, ${char.color} 28%, transparent);` : ""}">${char.name}</strong>
+          <span>${char.role}</span>
+        </button>
+      `).join("");
+
+      [...document.querySelectorAll(".char-tab")].forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentChar = Number(btn.dataset.char);
+          renderCharTabs();
+          renderCharacter();
+        });
+      });
+    }
+
+    function renderCharacter() {
+      const char = characters[currentChar];
+      charPanel.style.setProperty("--accent", char.color);
+      charImage.src = char.image;
+      charImage.alt = char.name;
+      charSymbol.textContent = char.symbol;
+      charFaction.textContent = char.faction;
+      charName.textContent = char.name;
+      charRole.textContent = char.role;
+      charDesc.textContent = char.desc;
+      charTags.innerHTML = char.tags.map(tag => `<span class="pill">${tag}</span>`).join("");
+      charBars.innerHTML = Object.entries(char.stats).map(([k, v]) => `
+        <div>
+          <div class="bar-top"><span>${k}</span><strong style="color:${char.color}">${v}</strong></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${v}%"></div></div>
+        </div>
+      `).join("");
+    }
+
+    function initNavSpy() {
+      const links = [...document.querySelectorAll(".nav-links a")];
+      const sections = ["home","flow","media","characters","cta"].map(id => document.getElementById(id));
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(link => {
+              link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+            });
+          }
+        });
+      }, { threshold: .5 });
+
+      sections.forEach(section => observer.observe(section));
+    }
+
+    function initBackgroundParticles() {
+      const canvas = document.getElementById("bgCanvas");
+      const ctx = canvas.getContext("2d");
+      let w, h;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        updateTrack();
+      }
+
+      resize();
+      window.addEventListener("resize", resize);
+
+      const colors = ["#00eaff", "#5ca0ff", "#ff4d8d", "#12f7b6", "#b56bff"];
+      const particles = Array.from({ length: 90 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - .5) * .25,
+        vy: (Math.random() - .5) * .25,
+        r: Math.random() * 1.8 + .2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        a: Math.random() * .45 + .15
+      }));
+
+      function loop() {
+        ctx.clearRect(0, 0, w, h);
+
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = w;
+          if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h;
+          if (p.y > h) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `${p.color}${Math.round(p.a * 255).toString(16).padStart(2, "0")}`;
+          ctx.fill();
+        }
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p = particles[i];
+            const q = particles[j];
+            const d = Math.hypot(p.x - q.x, p.y - q.y);
+            if (d < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = `rgba(0, 234, 255, ${(.16 * (1 - d / 120)).toFixed(3)})`;
+              ctx.lineWidth = .6;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+    }
+
+    renderShots();
+    renderCharTabs();
+    renderCharacter();
+    initHeader();
+    initHeadlineGlitch();
+    initNavSpy();
+    initBackgroundParticles();
+  </script>
+</body>
+</html>
